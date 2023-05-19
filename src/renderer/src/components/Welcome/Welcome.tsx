@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // import { dispatchIPCChannel, registerReplyCallbackIPCChannel } from '@wak/ipc';
 
 export const Welcome: React.FC = () => {
+  const [localVideoUrl, setLocalVideoUrl] = useState<string | undefined>();
+
   useEffect(() => {
-    const removeCallback = window.wak.registerReplyCallback('onRequestDownloadVideo', (evt) => {
-      alert(evt.data?.fileLocation);
-    });
+    const removeCallback = window.wak.registerReplyCallback(
+      'onRequestDownloadVideo',
+      (evt) => setLocalVideoUrl(evt.data?.fileLocation)
+    );
     return removeCallback;
-  }, []);
+  }, [setLocalVideoUrl]);
 
   const handleClick = (): void => {
     window.wak.dispatch('onRequestDownloadVideo', {
@@ -15,7 +18,16 @@ export const Welcome: React.FC = () => {
     });
   };
 
-  return <button onClick={handleClick}>다운로드</button>;
+  return (
+    <>
+      <button onClick={handleClick}>다운로드</button>
+      <video
+        controls
+        autoPlay
+        src={localVideoUrl ? `local-resource://${localVideoUrl}` : ''}
+      ></video>
+    </>
+  );
 };
 
 export default Welcome;

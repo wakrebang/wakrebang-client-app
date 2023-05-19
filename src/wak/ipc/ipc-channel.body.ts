@@ -1,3 +1,5 @@
+import { CryptoOption } from '@wak/crypto';
+
 export interface IPCChannelBody {
   requestTimestamp: Date;
 }
@@ -7,9 +9,11 @@ export interface DownloadVideoBody {
 }
 export interface EncryptVideoBody {
   rawFileLocation: string;
+  cryptoOptions: CryptoOption[];
 }
 export interface DecryptVideoBody {
   encryptedFileLocation: string;
+  cryptoOptions: CryptoOption[];
 }
 export type LoadConfigurationBody = undefined;
 
