@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
+// import { registerHandlerIPCChannel } from '../ipc';
 
 function createWindow(): void {
   // Create the browser window.
@@ -57,6 +58,14 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  //#region IPC Channel
+  // registerHandlerIPCChannel('onRequestDownloadVideo', (body) => {
+  //   return {
+  //     fileLocation: ''
+  //   };
+  // });
+  //#endregion
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

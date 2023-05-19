@@ -27,14 +27,6 @@ function dispatchIPCChannel<K extends keyof IPCChannelBodyMap>(
   ipcRenderer.send(channelType, __channelBody);
 }
 
-function registerHandlerIPCChannel<K extends keyof IPCChannelWithoutBody>(
-  channelType: K,
-  handler: (body: IPCChannelBody) => IPCChannelEventMap[K]
-): void;
-function registerHandlerIPCChannel<K extends keyof IPCChannelWithBody>(
-  channelType: K,
-  handler: (body: IPCChannelBodyMap[K] & IPCChannelBody) => IPCChannelEventMap[K]
-): void;
 function registerHandlerIPCChannel<K extends keyof IPCChannelBodyMap>(
   channelType: K,
   handler: (body: IPCChannelBodyMap[K] & IPCChannelBody) => IPCChannelEventMap[K]
@@ -51,7 +43,7 @@ function registerReplyCallbackIPCChannel<K extends keyof IPCChannelEventMap>(
   replyChannelType: ReplyIPCChannelEvent<K>,
   callback: (evt: IPCChannelEventMap[K]) => void
 ): void {
-  ipcRenderer.on(replyChannelType, (evt, chlEvent: IPCChannelEventMap[K]) => callback(chlEvent));
+  ipcRenderer.on(replyChannelType, (_evt, chlEvent: IPCChannelEventMap[K]) => callback(chlEvent));
 }
 
 export { dispatchIPCChannel, registerHandlerIPCChannel, registerReplyCallbackIPCChannel };
