@@ -2,7 +2,8 @@ import { app, shell, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
-// import { registerHandlerIPCChannel } from '../ipc';
+import { registerHandlerIPCChannel } from '@wak/ipc';
+import { downloadFromYoutube } from '@wak/youtube';
 
 function createWindow(): void {
   // Create the browser window.
@@ -21,6 +22,7 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
+    mainWindow.webContents.openDevTools();
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -60,11 +62,16 @@ app.whenReady().then(() => {
   });
 
   //#region IPC Channel
-  // registerHandlerIPCChannel('onRequestDownloadVideo', (body) => {
-  //   return {
-  //     fileLocation: ''
-  //   };
-  // });
+  registerHandlerIPCChannel('onRequestDownloadVideo', async (body) => {
+    const videoFilePath = await downloadFromYoutube(
+      body.youtubeUrl,
+      '/Users/byungjin/Lab/wakrebang/wakrebang-client-app/1.mp4'
+    );
+
+    return {
+      fileLocation: videoFilePath
+    };
+  });
   //#endregion
 });
 
