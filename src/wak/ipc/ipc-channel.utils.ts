@@ -27,6 +27,9 @@ function dispatchIPCChannel<K extends keyof IPCChannelBodyMap>(
   ipcRenderer.send(channelType, __channelBody);
 }
 
+//#endregion
+
+//#region  registerHandlerIPCChannel
 function computeReplyChannelType<K extends keyof IPCChannelEventMap>(channelType: K): string {
   return 'reply' + channelType.charAt(0).toUpperCase() + channelType.slice(1);
 }
@@ -54,13 +57,32 @@ function registerHandlerIPCChannel<K extends keyof IPCChannelBodyMap>(
   });
 }
 
+function ipcChannelHandler<K extends keyof IPCChannelBodyMap>(
+  ...args: Parameters<typeof registerHandlerIPCChannel<K>>
+): {
+  channelType: (typeof args)['0'];
+  handler: (typeof args)['1'];
+} {
+  return {
+    channelType: args[0],
+    handler: args[1]
+  };
+}
+
+//#endregion
+
+//#region registerReplyCallbackIPCChannel
+
 function registerReplyCallbackIPCChannel<K extends keyof IPCChannelEventMap>(
   channelType: K,
-  callback: (evt: IPCChannelEventMap[K]) => void
+  callback: (evt: IPCChannelEvent<IPCChannelEventMap[K], IPCChannelBodyMap[K]>) => void
 ): () => void {
   const replyChannelType = computeReplyChannelType(channelType);
 
-  const __callback = (_evt, chlEvent: IPCChannelEventMap[K]): void => callback(chlEvent);
+  const __callback = (
+    _evt,
+    chlEvent: IPCChannelEvent<IPCChannelEventMap[K], IPCChannelBodyMap[K]>
+  ): void => callback(chlEvent);
 
   ipcRenderer.on(replyChannelType, __callback);
 
@@ -70,4 +92,13 @@ function registerReplyCallbackIPCChannel<K extends keyof IPCChannelEventMap>(
   };
 }
 
-export { dispatchIPCChannel, registerHandlerIPCChannel, registerReplyCallbackIPCChannel };
+//#endregion
+
+export const channels = {
+  dispatch: dispatchIPCChannel,
+  registerHandler: registerHandlerIPCChannel,
+  registerReplyCallback: registerReplyCallbackIPCChannel,
+  handlerItem: ipcChannelHandler
+};
+
+export default channels;

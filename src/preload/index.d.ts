@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload';
-import * as WakIPC from '@wak/ipc';
+import { channels as WakIPC } from '@wak/ipc';
 
 declare global {
   interface Window {

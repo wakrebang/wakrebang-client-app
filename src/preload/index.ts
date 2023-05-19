@@ -1,9 +1,9 @@
 import { contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import * as wakIPC from '@wak/ipc';
+import { channels } from '@wak/ipc';
 
 // Custom APIs for renderer
-const wak = wakIPC;
+const wak = channels;
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

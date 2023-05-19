@@ -1,7 +1,7 @@
-export type IPCChannelEvent<E = unknown, Body = unknown> = {
+export type IPCChannelEvent<TData = unknown, TBody = unknown> = {
   eventTimestamp: Date;
-  body: Body;
-  data?: E;
+  body: TBody;
+  data?: TData;
   error?: IPCChannelEventError;
 };
 

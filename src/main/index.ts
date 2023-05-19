@@ -2,8 +2,7 @@ import { app, shell, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
-import { registerHandlerIPCChannel } from '@wak/ipc';
-import { downloadFromYoutube } from '@wak/youtube';
+import { setupIPCChannelHandler } from '@wak/ipc';
 
 function createWindow(): void {
   // Create the browser window.
@@ -62,16 +61,7 @@ app.whenReady().then(() => {
   });
 
   //#region IPC Channel
-  registerHandlerIPCChannel('onRequestDownloadVideo', async (body) => {
-    const videoFilePath = await downloadFromYoutube(
-      body.youtubeUrl,
-      '/Users/byungjin/Lab/wakrebang/wakrebang-client-app/1.mp4'
-    );
-
-    return {
-      fileLocation: videoFilePath
-    };
-  });
+  setupIPCChannelHandler();
   //#endregion
 });
 
