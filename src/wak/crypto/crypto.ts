@@ -6,14 +6,24 @@ export type CryptoOption = {
   key: CipherKey;
 };
 
-const createCryptoOption = (
+export type RawCryptoOption = {
+  algorithm: CipherGCMTypes;
+  key: string;
+};
+
+const createRawCryptoOption = (
   algorithm: CipherGCMTypes,
   key: string
-): CryptoOption => ({
+): RawCryptoOption => ({
   algorithm,
+  key
+});
+
+const createCryptoOptionFromRaw = (raw: RawCryptoOption): CryptoOption => ({
+  algorithm: raw.algorithm,
   key: crypto
     .createHash('sha256')
-    .update(String(key))
+    .update(String(raw.key))
     .digest('base64')
     .substring(0, 32)
 });
@@ -101,7 +111,8 @@ function writeFileNonBlocking(path: string, buffer: Buffer): Promise<void> {
 //#endregion
 
 export const cryptos = {
-  createCryptoOption,
+  createCryptoOptionFromRaw,
+  createRawCryptoOption,
   encryptBuffer,
   encryptBufferMultipleOptions,
   decryptBuffer,

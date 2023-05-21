@@ -1,5 +1,9 @@
-import { channels } from './ipc-channel.utils';
 import { downloadFromYoutube } from '@wak/youtube';
+import { cryptos } from '@wak/crypto';
+import { resolve } from 'path';
+import { v1 as uuid } from 'uuid';
+import { unlink } from 'fs';
+import { channels } from './ipc-channel.utils';
 
 const item = channels.handlerItem;
 
@@ -7,7 +11,7 @@ const handlers = [
   item('onRequestDownloadVideo', async (body) => {
     const videoFilePath = await downloadFromYoutube(
       body.youtubeUrl,
-      '/Users/byungjin/Lab/wakrebang/wakrebang-client-app/1.mp4'
+      `/Users/byungjin/Lab/wakrebang/wakrebang-client-app/${body.savedFileName}.mp4`
     );
 
     return {
@@ -18,8 +22,23 @@ const handlers = [
     return {
       data: ''
     };
+  }),
+  item('onRequestEncryptVideo', async (body) => {
+    const destinationLocation = resolve(__dirname, `./${uuid()}.mp4`);
+    await cryptos.encryptFile(
+      body.rawFileLocation,
+      destinationLocation,
+      body.cryptoOptions.map(cryptos.createCryptoOptionFromRaw)
+    );
+
+    return {
+      encryptedFileLocation: destinationLocation
+    };
+  }),
+  item('onRequestRemoveFile', async (body) => {
+    unlink(body.fileLocation, (err) => err);
+    return {};
   })
-  // item('onRequestEncryptVideo', async (body) => {})
 ];
 
 export const setupIPCChannelHandler = (): void => {

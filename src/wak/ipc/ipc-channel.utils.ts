@@ -109,13 +109,37 @@ function registerReplyCallbackIPCChannel<K extends keyof IPCChannelEventMap>(
   };
 }
 
+function registerReplyCallbackIPCChannelOnce<
+  K extends keyof IPCChannelEventMap
+>(
+  channelType: K,
+  callback: (
+    evt: IPCChannelEvent<IPCChannelEventMap[K], IPCChannelBodyMap[K]>
+  ) => void
+): () => void {
+  const replyChannelType = computeReplyChannelType(channelType);
+
+  const __callback = (
+    _evt,
+    chlEvent: IPCChannelEvent<IPCChannelEventMap[K], IPCChannelBodyMap[K]>
+  ): void => callback(chlEvent);
+
+  ipcRenderer.once(replyChannelType, __callback);
+
+  // return remove Function
+  return () => {
+    ipcRenderer.removeListener(replyChannelType, __callback);
+  };
+}
+
 //#endregion
 
 export const channels = {
   dispatch: dispatchIPCChannel,
   registerHandler: registerHandlerIPCChannel,
   registerReplyCallback: registerReplyCallbackIPCChannel,
-  handlerItem: ipcChannelHandler
+  handlerItem: ipcChannelHandler,
+  registerReplyCallbackOnce: registerReplyCallbackIPCChannelOnce
 };
 
 export default channels;

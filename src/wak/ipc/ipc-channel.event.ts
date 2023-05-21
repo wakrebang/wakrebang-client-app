@@ -18,6 +18,10 @@ export interface LoadConfigurationEvent {
   data: any; // TODO Make Config Interface
 }
 
+export interface RemoveFileEvent {
+  success?: boolean;
+}
+
 export interface IPCChannelEventMap {
   //#region Render -> Main
   /**
@@ -36,6 +40,10 @@ export interface IPCChannelEventMap {
    * 여러 환경 설정 파일 읽기를 결과 객체
    */
   onRequestLoadConfiguration: LoadConfigurationEvent;
+
+  onRequestDoNotUse: undefined;
+
+  onRequestRemoveFile: RemoveFileEvent;
 }
 
 export type ReplyIPCChannelEvent<T extends string> = `reply${Capitalize<T>}`;
