@@ -24,7 +24,7 @@ const handlers = [
     };
   }),
   item('onRequestEncryptVideo', async (body) => {
-    const destinationLocation = resolve(__dirname, `./${uuid()}.mp4`);
+    const destinationLocation = resolve(__dirname, `./${uuid()}.yrs`);
     await cryptos.encryptFile(
       body.rawFileLocation,
       destinationLocation,
@@ -33,6 +33,17 @@ const handlers = [
 
     return {
       encryptedFileLocation: destinationLocation
+    };
+  }),
+  item('onRequestDecryptVideo', async (body) => {
+    const destinationLocation = resolve(__dirname, `./${uuid()}.mp4`);
+    await cryptos.decryptFile(
+      body.encryptedFileLocation,
+      destinationLocation,
+      body.cryptoOptions.map(cryptos.createCryptoOptionFromRaw)
+    );
+    return {
+      decryptedFileLocation: destinationLocation
     };
   }),
   item('onRequestRemoveFile', async (body) => {

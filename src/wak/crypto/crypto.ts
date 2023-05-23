@@ -1,18 +1,18 @@
-import crypto, { CipherGCMTypes, CipherKey } from 'crypto';
+import crypto, { CipherKey } from 'crypto';
 import fs from 'fs';
 
 export type CryptoOption = {
-  algorithm: CipherGCMTypes;
+  algorithm: string;
   key: CipherKey;
 };
 
 export type RawCryptoOption = {
-  algorithm: CipherGCMTypes;
+  algorithm: string;
   key: string;
 };
 
 const createRawCryptoOption = (
-  algorithm: CipherGCMTypes,
+  algorithm: string,
   key: string
 ): RawCryptoOption => ({
   algorithm,
