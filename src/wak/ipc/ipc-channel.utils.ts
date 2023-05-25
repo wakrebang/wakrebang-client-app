@@ -65,6 +65,7 @@ function registerHandlerIPCChannel<K extends keyof IPCChannelBodyMap>(
           'Channel Handler를 실행하는 도중 오류가 발생하였습니다.',
           error
         );
+        console.log(error);
       }
 
       evt.reply(computeReplyChannelType(channelType), result);

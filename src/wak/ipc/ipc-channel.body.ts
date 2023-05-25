@@ -6,18 +6,26 @@ export interface IPCChannelBody {
 
 export interface DownloadVideoBody {
   youtubeUrl: string;
-  savedFileName: string;
 }
-export interface EncryptVideoBody {
-  rawFileLocation: string;
+export interface EncryptBufferBody {
+  buffer: Buffer;
   cryptoOptions: RawCryptoOption[];
 }
-export interface DecryptVideoBody {
-  encryptedFileLocation: string;
+export interface DecryptBufferBody {
+  buffer: Buffer;
   cryptoOptions: RawCryptoOption[];
 }
 
 export interface RemoveFileBody {
+  fileLocation: string;
+}
+
+export interface WriteFileBody {
+  fileLocation: string;
+  buffer: Buffer;
+}
+
+export interface ReadFileBody {
   fileLocation: string;
 }
 
@@ -40,13 +48,17 @@ export interface IPCChannelWithBody {
   /**
    * 다운로드된 비디오를 암호화 요청합니다.
    */
-  onRequestEncryptVideo: EncryptVideoBody;
+  onRequestEncryptBuffer: EncryptBufferBody;
   /**
    * 암호화된 비디오를 복호화 요청합니다.
    */
-  onRequestDecryptVideo: DecryptVideoBody;
+  onRequestDecryptBuffer: DecryptBufferBody;
 
   onRequestRemoveFile: RemoveFileBody;
+
+  onRequestWriteFile: WriteFileBody;
+
+  onRequestReadFile: ReadFileBody;
 }
 
 export type IPCChannelBodyMap = IPCChannelWithoutBody & IPCChannelWithBody;

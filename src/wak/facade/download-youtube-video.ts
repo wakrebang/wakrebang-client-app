@@ -1,25 +1,28 @@
-import { EncryptVideoBody, IPCChannelBodyMap, RemoveFileBody } from '..';
+import { resolve } from 'path';
+import { EncryptBufferBody, IPCChannelBodyMap, WriteFileBody } from '..';
 import { createFacadeAPI, facadeItem } from './base';
+import { v1 } from 'uuid';
 
 export const executeDownloadYoutubeVideo = createFacadeAPI<
   IPCChannelBodyMap['onRequestDownloadVideo'] & {
-    cryptoOptions: EncryptVideoBody['cryptoOptions'];
+    cryptoOptions: EncryptBufferBody['cryptoOptions'];
   },
   string
 >([
   facadeItem('onRequestDownloadVideo', (evt) => {
     return {
-      rawFileLocation: evt.data!.fileLocation,
+      buffer: evt.data!.buffer,
       cryptoOptions: (evt as any).body.cryptoOptions
-    } satisfies EncryptVideoBody;
+    } satisfies EncryptBufferBody;
   }),
-  facadeItem('onRequestEncryptVideo', (evt, [, setValue]) => {
-    setValue(evt.data!.encryptedFileLocation);
+  facadeItem('onRequestEncryptBuffer', (evt) => {
     return {
-      fileLocation: evt.body.rawFileLocation
-    } satisfies RemoveFileBody;
+      buffer: evt.data!.encryptedBuffer,
+      fileLocation: resolve(__dirname, `./${v1()}.ysv`)
+    } satisfies WriteFileBody;
   }),
-  facadeItem('onRequestRemoveFile', (evt) => {
-    return evt.body.fileLocation;
+  facadeItem('onRequestWriteFile', (evt, [, setValue]) => {
+    setValue(evt.body.fileLocation);
+    return true;
   })
 ]);

@@ -6,13 +6,13 @@ export type IPCChannelEvent<TData = unknown, TBody = unknown> = {
 };
 
 export interface DownloadVideoEvent {
-  fileLocation: string;
+  buffer: Buffer;
 }
-export interface EncryptVideoEvent {
-  encryptedFileLocation: string;
+export interface EncryptBufferEvent {
+  encryptedBuffer: Buffer;
 }
-export interface DecryptVideoEvent {
-  decryptedFileLocation: string;
+export interface DecryptBufferEvent {
+  decryptedBuffer: Buffer;
 }
 export interface LoadConfigurationEvent {
   data: any; // TODO Make Config Interface
@@ -20,6 +20,13 @@ export interface LoadConfigurationEvent {
 
 export interface RemoveFileEvent {
   success?: boolean;
+}
+export interface WriteFileEvent {
+  success?: boolean;
+}
+
+export interface ReadFileEvent {
+  buffer: Buffer;
 }
 
 export interface IPCChannelEventMap {
@@ -31,11 +38,11 @@ export interface IPCChannelEventMap {
   /**
    * 다운로드된 비디오를 암호화 결과 객체
    */
-  onRequestEncryptVideo: EncryptVideoEvent;
+  onRequestEncryptBuffer: EncryptBufferEvent;
   /**
    * 암호화된 비디오를 복호화 결과 객체
    */
-  onRequestDecryptVideo: DecryptVideoEvent;
+  onRequestDecryptBuffer: DecryptBufferEvent;
   /**
    * 여러 환경 설정 파일 읽기를 결과 객체
    */
@@ -44,6 +51,10 @@ export interface IPCChannelEventMap {
   onRequestDoNotUse: undefined;
 
   onRequestRemoveFile: RemoveFileEvent;
+
+  onRequestWriteFile: WriteFileEvent;
+
+  onRequestReadFile: ReadFileEvent;
 }
 
 export type ReplyIPCChannelEvent<T extends string> = `reply${Capitalize<T>}`;

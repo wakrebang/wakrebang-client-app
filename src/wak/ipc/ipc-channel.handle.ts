@@ -1,21 +1,16 @@
 import { downloadFromYoutube } from '@wak/youtube';
 import { cryptos } from '@wak/crypto';
-import { resolve } from 'path';
-import { v1 as uuid } from 'uuid';
 import { unlink } from 'fs';
 import { channels } from './ipc-channel.utils';
+import { readFileNonBlocking, writeFileNonBlocking } from '@wak/file/file';
 
 const item = channels.handlerItem;
 
 const handlers = [
   item('onRequestDownloadVideo', async (body) => {
-    const videoFilePath = await downloadFromYoutube(
-      body.youtubeUrl,
-      `/Users/byungjin/Lab/wakrebang/wakrebang-client-app/${body.savedFileName}.mp4`
-    );
-
+    const buffer = await downloadFromYoutube(body.youtubeUrl);
     return {
-      fileLocation: videoFilePath
+      buffer
     };
   }),
   item('onRequestLoadConfiguration', async () => {
@@ -23,31 +18,36 @@ const handlers = [
       data: ''
     };
   }),
-  item('onRequestEncryptVideo', async (body) => {
-    const destinationLocation = resolve(__dirname, `./${uuid()}.yrs`);
-    await cryptos.encryptFile(
-      body.rawFileLocation,
-      destinationLocation,
+  item('onRequestEncryptBuffer', async (body) => {
+    const buffer = cryptos.encryptBufferMultipleOptions(
+      body.buffer,
       body.cryptoOptions.map(cryptos.createCryptoOptionFromRaw)
     );
 
     return {
-      encryptedFileLocation: destinationLocation
+      encryptedBuffer: buffer
     };
   }),
-  item('onRequestDecryptVideo', async (body) => {
-    const destinationLocation = resolve(__dirname, `./${uuid()}.mp4`);
-    await cryptos.decryptFile(
-      body.encryptedFileLocation,
-      destinationLocation,
+  item('onRequestDecryptBuffer', async (body) => {
+    const buffer = cryptos.decryptBufferMultipleOptions(
+      body.buffer,
       body.cryptoOptions.map(cryptos.createCryptoOptionFromRaw)
     );
     return {
-      decryptedFileLocation: destinationLocation
+      decryptedBuffer: buffer
     };
   }),
   item('onRequestRemoveFile', async (body) => {
     unlink(body.fileLocation, (err) => err);
+    return {};
+  }),
+  item('onRequestReadFile', async (body) => {
+    return {
+      buffer: await readFileNonBlocking(body.fileLocation)
+    };
+  }),
+  item('onRequestWriteFile', async (body) => {
+    await writeFileNonBlocking(body.fileLocation, body.buffer);
     return {};
   })
 ];
