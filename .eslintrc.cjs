@@ -14,14 +14,15 @@ module.exports = {
     sourceType: 'module',
     ecmaVersion: 2021
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'prettier'],
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:prettier/recommended'
+    'plugin:prettier/recommended',
+    'prettier'
   ],
   rules: {
     '@typescript-eslint/ban-ts-comment': [
@@ -37,6 +38,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
     semi: 'off'
   },
   overrides: [
