@@ -1,52 +1,17 @@
 module.exports = {
-  root: true,
-  env: {
-    browser: true,
-    commonjs: true,
-    es6: true,
-    node: true
-  },
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true
-    },
-    sourceType: 'module',
-    ecmaVersion: 2021
-  },
-  plugins: ['@typescript-eslint', 'prettier'],
+  env: { browser: true, es2020: true, node: true },
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react/jsx-runtime',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:react-hooks/recommended',
     'plugin:prettier/recommended',
     'prettier'
   ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  plugins: ['react-refresh'],
   rules: {
-    '@typescript-eslint/ban-ts-comment': [
-      'error',
-      { 'ts-ignore': 'allow-with-description' }
-    ],
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-empty-function': [
-      'error',
-      { allow: ['arrowFunctions'] }
-    ],
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
-    'prettier/prettier': ['error', { endOfLine: 'auto' }],
-    semi: 'off'
-  },
-  overrides: [
-    {
-      files: ['*.js'],
-      rules: {
-        '@typescript-eslint/explicit-function-return-type': 'off'
-      }
-    }
-  ]
+    'react-refresh/only-export-components': 'warn',
+    'prettier/prettier': ['error', { endOfLine: 'auto' }]
+  }
 };
