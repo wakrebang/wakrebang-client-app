@@ -1,5 +1,13 @@
-export interface CryptoCommandParam {
-  buffer: number[] | ArrayBuffer;
+export interface EncryptFileCommandParam extends SecretObject {
+  path: string;
+  destination: string;
+}
+
+export interface DecryptFileCommandParam extends SecretObject {
+  path: string;
+}
+
+interface SecretObject {
   keys: string[];
   clientId: string;
 }

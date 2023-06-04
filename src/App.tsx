@@ -3,7 +3,12 @@ import './App.css';
 import { router } from './constants';
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      {/* <Microphone /> */}
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App;

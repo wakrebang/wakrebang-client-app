@@ -1,7 +1,30 @@
+use std::{path::Path, fs};
+
 use crypto::{aes};
 use sha256::digest;
+use tauri::api::file;
 
 #[tauri::command]
+pub async fn encrypt_file(path: String, destination: String, keys: Vec<String>, client_id: &str) -> Result<(), String> {
+  let buffer = file::read_binary(Path::new(&path)).unwrap();
+
+  let encrypted = crypt(buffer, keys, client_id).unwrap();
+
+  fs::remove_file(path);
+  fs::write(destination, encrypted).unwrap();
+
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn decrypt_file(path: String, keys: Vec<String>, client_id: &str) -> Result<Vec<u8>, String> {
+  let buffer = file::read_binary(Path::new(&path)).unwrap();
+
+  let decrypted = crypt(buffer, keys, client_id).unwrap();
+
+  Ok(decrypted)
+}
+
 pub fn crypt(buffer: Vec<u8>, keys: Vec<String>, client_id: &str) -> Result<Vec<u8>, ()> {
   let mut data = buffer;
   let iv = generate_key(client_id);

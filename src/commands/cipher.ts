@@ -1,29 +1,29 @@
-import { CryptoCommandParam, CryptoCommandResult } from '@/types';
+import { DecryptFileCommandParam, EncryptFileCommandParam } from '@/types';
 import { invoke } from '@tauri-apps/api';
 
 const CIPHER_CMD_KEY = {
-  Crypt: 'crypt'
+  EncryptFile: 'encrypt_file',
+  DecryptFile: 'decrypt_file'
 };
 
-export const encryptBuffer = async (
-  param: CryptoCommandParam
-): Promise<CryptoCommandResult> => await cryptBuffer(param);
+export const encryptFile = async (
+  param: EncryptFileCommandParam
+): Promise<string> =>
+  await invoke(CIPHER_CMD_KEY.EncryptFile, {
+    path: param.path,
+    destination: param.destination,
+    keys: param.keys,
+    clientId: param.clientId
+  });
 
-export const decryptBuffer = async (
-  param: CryptoCommandParam
+export const decryptFile = async (
+  param: DecryptFileCommandParam
 ): Promise<Blob> => {
   param.keys = [...param.keys].reverse();
-  const result = await cryptBuffer(param);
-  return new Blob([new Uint8Array(result)], { type: 'video/mp4' });
-};
-
-export const cryptBuffer = async (
-  param: CryptoCommandParam
-): Promise<CryptoCommandResult> => {
-  const result = await invoke(CIPHER_CMD_KEY.Crypt, {
-    buffer: param.buffer,
-    clientId: param.clientId,
-    keys: param.keys
+  const result = await invoke<number[]>(CIPHER_CMD_KEY.DecryptFile, {
+    path: param.path,
+    keys: param.keys,
+    clientId: param.clientId
   });
-  return result as CryptoCommandResult;
+  return new Blob([new Uint8Array(result)], { type: 'video/mp4' });
 };
