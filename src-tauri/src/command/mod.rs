@@ -1,28 +1,46 @@
-use std::{path::Path, fs};
+use std::{fs};
 
 use crypto::{aes};
 use sha256::digest;
-use tauri::api::file;
+use tauri::{api::file};
+
+use crate::STREAMING_MANAGER;
 
 #[tauri::command]
-pub async fn encrypt_file(path: String, destination: String, keys: Vec<String>, client_id: &str) -> Result<(), String> {
-  let buffer = file::read_binary(Path::new(&path)).unwrap();
-
-  let encrypted = crypt(buffer, keys, client_id).unwrap();
-
+pub async fn encrypt_file(path: String, destination: String, keys: Vec<String>, client_id: String) -> Result<bool, ()> {
+  let buffer = file::read_binary(&path).unwrap();
+  let encrypted = crypt(buffer, keys, &client_id).unwrap();
   fs::remove_file(path);
   fs::write(destination, encrypted).unwrap();
-
-  Ok(())
+  Ok(true)
 }
 
 #[tauri::command]
-pub async fn decrypt_file(path: String, keys: Vec<String>, client_id: &str) -> Result<Vec<u8>, String> {
-  let buffer = file::read_binary(Path::new(&path)).unwrap();
+pub async fn decrypt_stream(
+  stream_key: String, 
+  path: String, 
+  keys: Vec<String>, 
+  client_id: String
+) -> Result<bool, ()> {
+  if !STREAMING_MANAGER.lock().unwrap().is_stream(&stream_key) {
+    let buffer = file::read_binary(&path).unwrap();
+    let decrypted = crypt(buffer, keys, &client_id).unwrap();
+    STREAMING_MANAGER.lock().unwrap().add_stream(&stream_key, decrypted);
+  } 
+  Ok(true)
+}
 
-  let decrypted = crypt(buffer, keys, client_id).unwrap();
+#[tauri::command]
+pub fn drop_stream(
+  stream_key: String
+) -> Result<bool, ()> {
+  STREAMING_MANAGER.lock().unwrap().drop_stream(&stream_key);
+  Ok(true)
+}
 
-  Ok(decrypted)
+#[tauri::command]
+pub fn get_current_video_streams() -> Vec<String> {
+  STREAMING_MANAGER.lock().unwrap().keys().cloned().collect()
 }
 
 pub fn crypt(buffer: Vec<u8>, keys: Vec<String>, client_id: &str) -> Result<Vec<u8>, ()> {

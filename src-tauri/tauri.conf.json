@@ -43,6 +43,11 @@
           }
         ],
         "sidecar": true
+      },
+      "protocol": {
+        "all": true,
+        "asset": true,
+        "assetScope": []
       }
     },
     "bundle": {
@@ -83,7 +88,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; media-src stream: https://stream.localhost asset: https://asset.localhost"
     },
     "updater": {
       "active": false
