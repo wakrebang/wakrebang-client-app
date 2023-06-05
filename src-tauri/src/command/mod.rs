@@ -1,4 +1,4 @@
-use std::{fs};
+use std::{fs::{self}};
 
 use crypto::{aes};
 use sha256::digest;
@@ -6,12 +6,15 @@ use tauri::{api::file};
 
 use crate::STREAMING_MANAGER;
 
+const VIDEO_HEADER_SIZE: usize = 64;
+
 #[tauri::command]
 pub async fn encrypt_file(path: String, destination: String, keys: Vec<String>, client_id: String) -> Result<bool, ()> {
   let buffer = file::read_binary(&path).unwrap();
-  let encrypted = crypt(buffer, keys, &client_id).unwrap();
-  fs::remove_file(path);
-  fs::write(destination, encrypted).unwrap();
+  // Encrypt video header
+  let encrypted = crypt(buffer[0..VIDEO_HEADER_SIZE].to_vec(), keys, &client_id).unwrap();
+  fs::remove_file(path).err();
+  fs::write(destination, [encrypted, buffer[VIDEO_HEADER_SIZE..].to_vec()].concat()).unwrap();
   Ok(true)
 }
 
@@ -20,12 +23,17 @@ pub async fn decrypt_stream(
   stream_key: String, 
   path: String, 
   keys: Vec<String>, 
-  client_id: String
+  client_id: String,
+  enable: bool
 ) -> Result<bool, ()> {
   if !STREAMING_MANAGER.lock().unwrap().is_stream(&stream_key) {
     let buffer = file::read_binary(&path).unwrap();
-    let decrypted = crypt(buffer, keys, &client_id).unwrap();
-    STREAMING_MANAGER.lock().unwrap().add_stream(&stream_key, decrypted);
+    let decrypted = if enable {
+      crypt(buffer[0..VIDEO_HEADER_SIZE].to_vec(), keys, &client_id).unwrap()
+    } else {
+      buffer[0..VIDEO_HEADER_SIZE].to_vec()
+    };
+    STREAMING_MANAGER.lock().unwrap().add_stream(&stream_key, [decrypted, buffer[VIDEO_HEADER_SIZE..].to_vec()].concat());
   } 
   Ok(true)
 }

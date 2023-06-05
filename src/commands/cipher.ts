@@ -3,12 +3,12 @@ import { invoke } from '@tauri-apps/api';
 
 const CIPHER_CMD_KEY = {
   EncryptFile: 'encrypt_file',
-  DecryptFile: 'decrypt_file'
+  DecryptStream: 'decrypt_stream'
 };
 
 export const encryptFile = async (
   param: EncryptFileCommandParam
-): Promise<string> =>
+): Promise<boolean> =>
   await invoke(CIPHER_CMD_KEY.EncryptFile, {
     path: param.path,
     destination: param.destination,
@@ -16,14 +16,15 @@ export const encryptFile = async (
     clientId: param.clientId
   });
 
-export const decryptFile = async (
+export const decryptStream = async (
   param: DecryptFileCommandParam
-): Promise<Blob> => {
+): Promise<boolean> => {
   param.keys = [...param.keys].reverse();
-  const result = await invoke<number[]>(CIPHER_CMD_KEY.DecryptFile, {
+  return await invoke(CIPHER_CMD_KEY.DecryptStream, {
+    streamKey: param.streamKey,
     path: param.path,
     keys: param.keys,
-    clientId: param.clientId
+    clientId: param.clientId,
+    enable: param.enable ?? true
   });
-  return new Blob([new Uint8Array(result)], { type: 'video/mp4' });
 };

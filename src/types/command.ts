@@ -4,7 +4,9 @@ export interface EncryptFileCommandParam extends SecretObject {
 }
 
 export interface DecryptFileCommandParam extends SecretObject {
+  streamKey: string;
   path: string;
+  enable?: boolean;
 }
 
 interface SecretObject {
